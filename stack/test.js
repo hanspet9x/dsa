@@ -147,4 +147,35 @@ function largestRect(rects = [], width = 1){
     return stack.pop();
 }
 
-console.assert(largestRect([2,4,5,1,7,3],  1) == 7, 'LargestRect Error')
+
+function largestRect2(rects = []){
+    const stack = [[0, rects[0]]];
+    let max = 0;
+
+    for (let i = 1; i < rects.length; i++) {
+        const h = rects[i];
+        let index = i;
+        if (h < rects[i-1]){
+            let pos = 1;
+            while(i - pos >= 0 && rects[i-pos] > h){
+                const area = rects[i-pos] * pos;
+                max = Math.max(area, max);
+                stack.pop();
+                pos++;
+            }
+            index -=pos-1;
+        }
+        stack.push([index, h]); 
+    }
+
+    //go back;
+    stack.forEach(([i, h]) => {
+        const w = rects.length - i;
+        max =  Math.max(w*h, max);
+    });
+   
+    return max;
+    
+}
+console.log(largestRect2([2,4,5,1,7,3]))
+// console.assert(largestRect([2,4,5,1,7,3],  1) == 7, 'LargestRect Error')
