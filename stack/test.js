@@ -1,20 +1,20 @@
 
-const { _perf } = require("..");
+const { _perf, _log } = require("..");
 
-function reverse1(str){
+function reverse1(str) {
     const stack = [];
     for (const alp of str) {
         stack.push(alp);
     }
 
     let strNew = '';
-    for (let i = stack.length- 1; i >= 0; i--) {
+    for (let i = stack.length - 1; i >= 0; i--) {
         strNew += stack[i];
     }
     return strNew;
 }
 
-function reverse2(str){
+function reverse2(str) {
     //2
     let strNew = '';
     for (const alp of str) {
@@ -30,8 +30,8 @@ function reverse2(str){
 // _perf(reverse2.bind(null, 'Ade'), '2')
 // assert(reverse('Ade'), 'edA');
 
-function validBrackets(str=''){
-    if(str.length < 2) return false;
+function validBrackets(str = '') {
+    if (str.length < 2) return false;
     const stack = [];
 
     const dic = {
@@ -40,12 +40,12 @@ function validBrackets(str=''){
         '}': '{',
     }
 
-    const isOpen = (brac) =>  brac == '(' || brac == '[' || brac == '{';
+    const isOpen = (brac) => brac == '(' || brac == '[' || brac == '{';
 
     for (const alp of str) {
-        if(isOpen(alp)){
+        if (isOpen(alp)) {
             stack.push(alp);
-        }else{
+        } else {
             if (!stack.length) return false;
             const open = stack.pop();
             if (open !== dic[alp]) return false;
@@ -61,7 +61,7 @@ function validBrackets(str=''){
 // console.assert(validBrackets('[]') == true)
 // console.assert(validBrackets('[{()}]') == true)
 
-function reversePoliceNotation(arm = []){
+function reversePoliceNotation(arm = []) {
 
     const isOperator = (x) => ['+', '-', '/', '*'].includes(x);
     const calcs = (operator, operand, total) => {
@@ -77,23 +77,23 @@ function reversePoliceNotation(arm = []){
                 return total / operand
         }
     }
-    const stack= []
+    const stack = []
     let exp;
     for (const i of arm) {
-        if(isOperator(i)){
+        if (isOperator(i)) {
             //pop stack and evaluate
-            
+
             for (let j = stack.length - 1; j >= 0; j--) {
                 const element = stack.pop();
                 exp = calcs(i, element, exp)
             }
-        }else{
+        } else {
             stack.push(Number(i));
         }
     }
     return exp;
 }
-function reversePoliceNotation2(arm = []){
+function reversePoliceNotation2(arm = []) {
 
     const isOperator = (x) => ['+', '-', '/', '*'].includes(x);
     const calcs = (operator, operand, total) => {
@@ -109,10 +109,10 @@ function reversePoliceNotation2(arm = []){
                 return total / operand
         }
     }
-    const stack= []
-    
+    const stack = []
+
     for (const i of arm) {
-        if(isOperator(i)){
+        if (isOperator(i)) {
             //pop stack and evaluate
             let exp;
             for (let j = stack.length - 1; j >= 0; j--) {
@@ -120,7 +120,7 @@ function reversePoliceNotation2(arm = []){
                 exp = calcs(i, element, exp)
             }
             stack.push(exp);
-        }else{
+        } else {
             stack.push(Number(i));
         }
     }
@@ -134,12 +134,12 @@ function reversePoliceNotation2(arm = []){
 // _perf(reversePoliceNotation2.bind(null, ["2", "1", "+", "3", "*"]), 'reversePoliceNotation2')
 
 
-function largestRect(rects = [], width = 1){
+function largestRect(rects = [], width = 1) {
     const stack = [rects[0] * width];
-    
+
     for (let i = 1; i < rects.length; i++) {
         const rect = rects[i] * 1;
-        if (rect > stack[0]){
+        if (rect > stack[0]) {
             stack.pop();
             stack.push(rect)
         }
@@ -148,34 +148,84 @@ function largestRect(rects = [], width = 1){
 }
 
 
-function largestRect2(rects = []){
+function largestRect2(rects = []) {
     const stack = [[0, rects[0]]];
     let max = 0;
 
     for (let i = 1; i < rects.length; i++) {
         const h = rects[i];
         let index = i;
-        if (h < rects[i-1]){
+        if (h < rects[i - 1]) {
             let pos = 1;
-            while(i - pos >= 0 && rects[i-pos] > h){
-                const area = rects[i-pos] * pos;
+            while (i - pos >= 0 && rects[i - pos] > h) {
+                const area = rects[i - pos] * pos;
                 max = Math.max(area, max);
                 stack.pop();
                 pos++;
             }
-            index -=pos-1;
+            index -= pos - 1;
         }
-        stack.push([index, h]); 
+        stack.push([index, h]);
     }
 
     //go back;
     stack.forEach(([i, h]) => {
         const w = rects.length - i;
-        max =  Math.max(w*h, max);
+        max = Math.max(w * h, max);
     });
-   
+
     return max;
-    
+
 }
-console.log(largestRect2([2,4,5,1,7,3]))
+// console.log(largestRect2([2, 4, 5, 1, 7, 3]))
 // console.assert(largestRect([2,4,5,1,7,3],  1) == 7, 'LargestRect Error')
+
+function trappedWater(bars = []) {
+    const stack = [bars[0]];
+    let mark = 0;
+    let trapped = 0;
+    let start = false;
+
+    const calc = (newH, pop=false) => {
+        let x = stack.length - 1;
+        let hmax = 0;
+        const refH = pop ? mark : newH;
+        while (stack.length && x >= 1) {
+            const bar = pop ? stack.pop(): stack[x];
+            // break if the current is height is less than bar;
+            if(!pop && newH < bar) break;
+            hmax += refH - bar;
+            --x;
+        }
+        if(pop){
+            stack.pop();
+            start = false;
+        }
+        trapped = Math.max(trapped, hmax);
+    }
+
+    for (let i = 1; i < bars.length; i++) {
+        const bar = bars[i];
+        const prevBar = bars[i - 1];
+        if (bar >= prevBar) {
+            if (!start) {
+                stack.pop(); // [2]
+                stack.push(bar); //[4]
+                continue;
+            } else {
+                // chekck if bar height is not greater than the mark;
+                calc(bar, bar >= mark);
+            }
+        } else {
+            if (stack.length == 1) {
+                mark = prevBar;
+                start = true;
+            } 
+        }
+        stack.push(bar);
+    }
+    return trapped;
+}
+_log('Trapped', trappedWater([3,1,2,3]));
+_log('Trapped', trappedWater([2,4,5,1,7,3]));
+_log('Trapped', trappedWater([3,1,2,1,2,3]));
