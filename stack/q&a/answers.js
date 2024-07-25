@@ -1,5 +1,5 @@
 
-const { _perf, _log } = require("..");
+const { _perf, _log } = require("../..");
 
 function reverse1(str) {
     const stack = [];
